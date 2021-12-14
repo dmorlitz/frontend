@@ -8,6 +8,14 @@
 		>
 			{{ $t('task.show.noDates') }}
 		</fancycheckbox>
+		<fancycheckbox
+			@change="setDate"
+			class="is-pulled-right"
+			v-if="!showAll"
+			v-model="showOverdue"
+		>
+			{{ $t('task.show.showOverdue') }}
+		</fancycheckbox>
 		<h3 v-if="showAll && tasks.length > 0">
 			{{ $t('task.show.current') }}
 		</h3>
@@ -78,7 +86,7 @@ export default {
 		return {
 			tasks: [],
 			showNulls: true,
-			showOverdue: false,
+			showOverdue: this.$route.query.showOverdue,
 
 			cStartDate: null,
 			cEndDate: null,
@@ -207,7 +215,7 @@ export default {
 			// soonest before the later ones.
 			// We can't use the api sorting here because that sorts tasks with a due date after
 			// ones without a due date.
-			this.tasks = tasks.sort((a, b) => {
+			this.tasks = tasks.sort((b, a) => {
 				const sortByDueDate = b.dueDate - a.dueDate
 				return sortByDueDate === 0
 					? b.id - a.id
@@ -233,14 +241,14 @@ export default {
 		setDatesToNextWeek() {
 			this.cStartDate = new Date()
 			this.cEndDate = new Date((new Date()).getTime() + 7 * 24 * 60 * 60 * 1000)
-			this.showOverdue = false
+			this.showOverdue = this.$route.query.showOverdue
 			this.setDate()
 		},
 
 		setDatesToNextMonth() {
 			this.cStartDate = new Date()
 			this.cEndDate = new Date((new Date()).setMonth((new Date()).getMonth() + 1))
-			this.showOverdue = false
+			this.showOverdue = this.$route.query.showOverdue
 			this.setDate()
 		},
 
